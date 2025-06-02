@@ -1,14 +1,18 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
+
 const app = express();
-const PORT = 3000;
+const port = 3000; // fix: variable was PORT but used 'port' in listen
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Serve uploads folder statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Middleware to serve .html files without .html in URL
+// Middleware to serve .html files without .html in URL (optional)
 app.use((req, res, next) => {
   if (!path.extname(req.path)) {
     const filePath = path.join(__dirname, 'public', req.path + '.html');
@@ -24,39 +28,47 @@ app.use((req, res, next) => {
   }
 });
 
-app.use(express.static('public'));
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Multer setup for file uploads to 'uploads' folder
+const upload = multer({ dest: path.join(__dirname, 'uploads') });
+
+// POST endpoint to save generic submitted data to data.json
 app.post('/submit', (req, res) => {
   const newData = req.body;
   const filePath = path.join(__dirname, 'data.json');
+
   fs.readFile(filePath, 'utf8', (err, data) => {
     let jsonData = [];
     if (!err && data) {
-      jsonData = JSON.parse(data);
+      try {
+        jsonData = JSON.parse(data);
+        if (!Array.isArray(jsonData)) jsonData = [];
+      } catch {
+        jsonData = [];
+      }
     }
     jsonData.push(newData);
-    fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), err => {
+    fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), (err) => {
       if (err) return res.status(500).send('Failed to save data');
       res.send('Success');
     });
   });
 });
 
-
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // you can configure path
-
+// POST endpoint to save experience data with optional image upload
 app.post('/saveexperience', upload.single('section_image'), (req, res) => {
   const file = req.file;
   const { company, code_language, description } = req.body;
 
   const newData = {
     experience: {
-      company,
-      code_language,
-      description,
+      company: company || '',
+      code_language: code_language || '',
+      description: description || '',
       section_image: file ? file.originalname : null,
-      section_path: file ? file.path : null
+      section_path: file ? `/uploads/${file.filename}` : null // fix path for static serving
     }
   };
 
@@ -71,9 +83,7 @@ app.post('/saveexperience', upload.single('section_image'), (req, res) => {
         jsonData = [];
       }
     }
-
     jsonData.push(newData);
-
     fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), (err) => {
       if (err) return res.status(500).send('Failed to save data');
       res.send('Success');
@@ -81,25 +91,38 @@ app.post('/saveexperience', upload.single('section_image'), (req, res) => {
   });
 });
 
-
+// GET endpoint to get experience data
 app.get('/experience', (req, res) => {
   const filePath = path.join(__dirname, 'experience.json');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading data');
-    res.json(JSON.parse(data));
+    try {
+      res.json(JSON.parse(data));
+    } catch {
+      res.json([]);
+    }
   });
 });
 
-
+// GET endpoint to get generic data
 app.get('/data', (req, res) => {
   const filePath = path.join(__dirname, 'data.json');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading data');
-    res.json(JSON.parse(data));
+    try {
+      res.json(JSON.parse(data));
+    } catch {
+      res.json([]);
+    }
   });
 });
 
+// Serve index.html on all other routes (for SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
