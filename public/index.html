@@ -2,69 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-<!-- Basic Meta Tags -->
-<title>Shopify Custom Code Sharing | Free Custom Sections & Tutorials</title>
-<meta name="description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
+  <!-- Basic Meta Tags -->
+  <title>Shopify Custom Code Sharing | Free Custom Sections & Tutorials</title>
+  <meta name="description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
+  <meta name="keywords" content="Shopify custom code, Shopify sections, Shopify tutorials, free Shopify code, Shopify snippets, Shopify development">
 
-<!-- Keywords for SEO -->
-<meta name="keywords" content="Shopify custom code, Shopify sections, Shopify tutorials, free Shopify code, Shopify snippets, Shopify development">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="Shopify Custom Code Sharing | Free Custom Sections & Tutorials">
+  <meta property="og:description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
+  <meta property="og:image" content="https://shopifycodeshare.netlify.app/uploads/shopify-code-share.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shopifycodeshare.netlify.app">
 
-<!-- Open Graph / Facebook -->
-<meta property="og:title" content="Shopify Custom Code Sharing | Free Custom Sections & Tutorials">
-<meta property="og:description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
-<meta property="og:image" content="https://raw.githubusercontent.com/ahmedalimughal/Shopify-Custom-Code-Sharing/refs/heads/main/shopify-code-share.png">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://shopifycodeshare.netlify.app">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Shopify Custom Code Sharing | Free Custom Sections & Tutorials">
+  <meta name="twitter:description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
+  <meta name="twitter:image" content="https://shopifycodeshare.netlify.app/uploads/shopify-code-share.png">
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Shopify Custom Code Sharing | Free Custom Sections & Tutorials">
-<meta name="twitter:description" content="Shopify custom code aur sections ka collection jahan aap free me apne store ke liye code le sakte hain. Easy tutorials aur ready-made snippets.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/ahmedalimughal/Shopify-Custom-Code-Sharing/refs/heads/main/shopify-code-share.png">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body class="">
+
   <style>
     a.btn.btn-primary {
-    height: 48px;
-    display: flex
-;
-    align-items: center;
-    background: #111111;
-    border: 0;
-    padding: 20px;
-    border-radius: 12px;
-}
-.banner {
-    background: #111;
-    padding: 60px;
-    text-align: center;
-    color: white;
-}
-@media only screen and (max-width: 500px) {
-  .container {
-    max-width: 90% !important;
-  }
-}
-
+      height: 48px;
+      display: flex;
+      align-items: center;
+      background: #111111;
+      border: 0;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .banner {
+      background: #111;
+      padding: 60px;
+      text-align: center;
+      color: white;
+    }
+    @media only screen and (max-width: 500px) {
+      .container {
+        max-width: 90% !important;
+      }
+    }
   </style>
-  <div class="banner mb-5"><h2>Shopify Custom Sections</h2>
-  <p>Create and customize Shopify sections easily to build unique, flexible storefronts that match your brand and boost sales.</p></div>
+</head>
+<body>
+  <div class="banner mb-5">
+    <h2>Shopify Custom Sections</h2>
+    <p>Create and customize Shopify sections easily to build unique, flexible storefronts that match your brand and boost sales.</p>
+  </div>
+
   <div class="container">
-    
-    
     <div class="row">
       <div class="card">
         <div class="card-body">
           <div class="mb-3">
-      <input type="text" id="searchInput" class="form-control" placeholder="Search by code or language">
-    </div>
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by code or language" />
+          </div>
 
-    <div id="dataList" class="row mt-4"></div>
-    <nav>
-      <ul class="pagination justify-content-center mt-4" id="pagination"></ul>
-    </nav>
+          <div id="dataList" class="row mt-4"></div>
+
+          <nav>
+            <ul class="pagination justify-content-center mt-4" id="pagination"></ul>
+          </nav>
         </div>
       </div>
     </div>
@@ -88,30 +88,34 @@
         return;
       }
 
-      pageData.forEach((item) => {
-        const exp = item.experience;
-        const imageUrl = exp.section_path ? `/${exp.section_path.replace(/\\/g, '/')}` : '';
+      pageData.forEach(item => {
+        const exp = item.experience || {};
+        // Fix: section_path already includes /uploads/filename on server side
+        // just use it directly, and fallback to empty string if missing
+        const imageUrl = exp.section_path || '';
+
+        // Ensure description is a valid URL or fallback to '#'
+        const codeLink = exp.description && exp.description.startsWith('http') ? exp.description : '#';
 
         $('#dataList').append(`
           <div class="col-12 col-lg-4 mb-3">
             <div class="card h-100">
               <div class="card-body">
-                ${imageUrl ? `<img src="${imageUrl}" class="img-fluid w-100 mb-2" />` : ''}
-                <h5 class="card-title">${exp.company}</h5>
-                <p class="card-text"><strong>Language:</strong> ${exp.code_language}</p>
+                ${imageUrl ? `<img src="${imageUrl}" alt="Image for ${exp.company}" class="img-fluid w-100 mb-2" />` : ''}
+                <h5 class="card-title">${exp.company || 'No Company'}</h5>
+                <p class="card-text"><strong>Language:</strong> ${exp.code_language || 'N/A'}</p>
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
-                   <a href="${exp.description}" target="_blank" class="btn btn-primary">View Code</a>
-                 <a href="https://www.buymeacoffee.com/ahmedalimughal">
-                    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=ahmedalimughal&button_colour=111&font_colour=ffb400&font_family=Cookie&outline_colour=ffb400&coffee_colour=ffb400" height="auto" width="100%" />
-                </a>
+                   <a href="${codeLink}" target="_blank" class="btn btn-primary">View Code</a>
+                   <a href="https://www.buymeacoffee.com/ahmedalimughal" target="_blank" rel="noopener">
+                    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=ahmedalimughal&button_colour=111&font_colour=ffb400&font_family=Cookie&outline_colour=ffb400&coffee_colour=ffb400" height="auto" width="100%" alt="Buy me a coffee" />
+                  </a>
                 </div>
                 <div class="actions mt-2 mb-2">
-                  <a href="https://github.com/ahmedalimughal"><img src="https://img.shields.io/badge/-GitHub-181717?&logo=github&logoColor=white&style=for-the-badge" /></a>
-                  <a href="https://www.linkedin.com/in/ahmed-ali-mughal/"><img src="https://img.shields.io/badge/-LinkedIn-0077B5?&logo=linkedin&logoColor=white&style=for-the-badge" /></a>
-                  <a href="https://twitter.com/AhmedAliMexah"><img src="https://img.shields.io/badge/-Twitter-1DA1F2?&logo=twitter&logoColor=white&style=for-the-badge" /></a>
-                  <a href="mailto:ahmedali110d@gmail.com"><img src="https://img.shields.io/badge/-Email-D14836?&logo=gmail&logoColor=white&style=for-the-badge" /></a>
-                  </div>
-                  
+                  <a href="https://github.com/ahmedalimughal" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/-GitHub-181717?&logo=github&logoColor=white&style=for-the-badge" alt="GitHub" /></a>
+                  <a href="https://www.linkedin.com/in/ahmed-ali-mughal/" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/-LinkedIn-0077B5?&logo=linkedin&logoColor=white&style=for-the-badge" alt="LinkedIn" /></a>
+                  <a href="https://twitter.com/AhmedAliMexah" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/-Twitter-1DA1F2?&logo=twitter&logoColor=white&style=for-the-badge" alt="Twitter" /></a>
+                  <a href="mailto:ahmedali110d@gmail.com"><img src="https://img.shields.io/badge/-Email-D14836?&logo=gmail&logoColor=white&style=for-the-badge" alt="Email" /></a>
+                </div>
               </div>
             </div>
           </div>
@@ -122,62 +126,57 @@
     }
 
     function renderPagination() {
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  let paginationHTML = '';
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      let paginationHTML = '';
 
-  // Prev button
-  paginationHTML += `
-    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-      <a class="page-link" href="#" id="prevPage">Prev</a>
-    </li>`;
+      paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" id="prevPage">Prev</a>
+        </li>`;
 
-  // Numbered pages
-  for (let i = 1; i <= totalPages; i++) {
-    paginationHTML += `
-      <li class="page-item ${i === currentPage ? 'active' : ''}">
-        <a class="page-link" href="#">${i}</a>
-      </li>`;
-  }
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#">${i}</a>
+          </li>`;
+      }
 
-  // Next button
-  paginationHTML += `
-    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-      <a class="page-link" href="#" id="nextPage">Next</a>
-    </li>`;
+      paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" id="nextPage">Next</a>
+        </li>`;
 
-  $('#pagination').html(paginationHTML);
+      $('#pagination').html(paginationHTML);
 
-  // Page number click
-  $('.page-link').not('#prevPage, #nextPage').click(function(e) {
-    e.preventDefault();
-    currentPage = parseInt($(this).text());
-    renderData(currentPage);
-  });
+      $('.page-link').not('#prevPage, #nextPage').click(function(e) {
+        e.preventDefault();
+        currentPage = parseInt($(this).text());
+        renderData(currentPage);
+      });
 
-  // Prev click
-  $('#prevPage').click(function(e) {
-    e.preventDefault();
-    if (currentPage > 1) {
-      currentPage--;
-      renderData(currentPage);
+      $('#prevPage').click(function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          currentPage--;
+          renderData(currentPage);
+        }
+      });
+
+      $('#nextPage').click(function(e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderData(currentPage);
+        }
+      });
     }
-  });
-
-  // Next click
-  $('#nextPage').click(function(e) {
-    e.preventDefault();
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderData(currentPage);
-    }
-  });
-}
-
 
     function filterData(searchText) {
       searchText = searchText.toLowerCase();
       filteredData = allData.filter(item => {
-        const { company = '', code_language = '' } = item.experience;
+        const exp = item.experience || {};
+        const company = exp.company || '';
+        const code_language = exp.code_language || '';
         return (
           company.toLowerCase().includes(searchText) ||
           code_language.toLowerCase().includes(searchText)
@@ -189,8 +188,8 @@
 
     $(document).ready(function() {
       $.get('/experience', function(data) {
-        allData = data;
-        filteredData = data;
+        allData = data || [];
+        filteredData = allData;
         renderData(currentPage);
       });
 
