@@ -88,67 +88,35 @@
         return;
       }
 
-     ChatGPT said:
-Nice! Your frontend code looks pretty solid already for displaying and paginating the /experience data fetched from your backend.
+      pageData.forEach((item) => {
+        const exp = item.experience;
+        const imageUrl = exp.section_path ? `/${exp.section_path.replace(/\\/g, '/')}` : '';
 
-A few suggestions/fixes to ensure smooth working with your backend Express app:
-Fix image URL generation
-Currently you do:
-
-js
-Copy
-Edit
-const imageUrl = exp.section_path ? `/${exp.section_path.replace(/\\/g, '/')}` : '';
-But your backend sends section_path already starting with /uploads/filename. So just do:
-
-js
-Copy
-Edit
-const imageUrl = exp.section_path || '';
-No need to add extra / or replace slashes.
-
-Check for null or missing experience
-Some data might not have the experience key or it might be null. So safely do:
-
-js
-Copy
-Edit
-const exp = item.experience || {};
-Improve "View Code" button link
-You set href="${exp.description}" but description might not be a URL. If description is code snippet or text, better to display or link differently. But if it’s a URL, keep it. Just be sure.
-
-Updated snippet inside renderData:
-js
-Copy
-Edit
-pageData.forEach((item) => {
-  const exp = item.experience || {};
-  const imageUrl = exp.section_path || '';
-
-  $('#dataList').append(`
-    <div class="col-12 col-lg-4 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          ${imageUrl ? `<img src="${imageUrl}" class="img-fluid w-100 mb-2" />` : ''}
-          <h5 class="card-title">${exp.company || 'No Company'}</h5>
-          <p class="card-text"><strong>Language:</strong> ${exp.code_language || 'N/A'}</p>
-          <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
-             <a href="${exp.description || '#'}" target="_blank" class="btn btn-primary">View Code</a>
-           <a href="https://www.buymeacoffee.com/ahmedalimughal">
-              <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=ahmedalimughal&button_colour=111&font_colour=ffb400&font_family=Cookie&outline_colour=ffb400&coffee_colour=ffb400" height="auto" width="100%" />
-          </a>
+        $('#dataList').append(`
+          <div class="col-12 col-lg-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body">
+                ${imageUrl ? `<img src="${imageUrl}" class="img-fluid w-100 mb-2" />` : ''}
+                <h5 class="card-title">${exp.company}</h5>
+                <p class="card-text"><strong>Language:</strong> ${exp.code_language}</p>
+                <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+                   <a href="${exp.description}" target="_blank" class="btn btn-primary">View Code</a>
+                 <a href="https://www.buymeacoffee.com/ahmedalimughal">
+                    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=ahmedalimughal&button_colour=111&font_colour=ffb400&font_family=Cookie&outline_colour=ffb400&coffee_colour=ffb400" height="auto" width="100%" />
+                </a>
+                </div>
+                <div class="actions mt-2 mb-2">
+                  <a href="https://github.com/ahmedalimughal"><img src="https://img.shields.io/badge/-GitHub-181717?&logo=github&logoColor=white&style=for-the-badge" /></a>
+                  <a href="https://www.linkedin.com/in/ahmed-ali-mughal/"><img src="https://img.shields.io/badge/-LinkedIn-0077B5?&logo=linkedin&logoColor=white&style=for-the-badge" /></a>
+                  <a href="https://twitter.com/AhmedAliMexah"><img src="https://img.shields.io/badge/-Twitter-1DA1F2?&logo=twitter&logoColor=white&style=for-the-badge" /></a>
+                  <a href="mailto:ahmedali110d@gmail.com"><img src="https://img.shields.io/badge/-Email-D14836?&logo=gmail&logoColor=white&style=for-the-badge" /></a>
+                  </div>
+                  
+              </div>
+            </div>
           </div>
-          <div class="actions mt-2 mb-2">
-            <a href="https://github.com/ahmedalimughal"><img src="https://img.shields.io/badge/-GitHub-181717?&logo=github&logoColor=white&style=for-the-badge" /></a>
-            <a href="https://www.linkedin.com/in/ahmed-ali-mughal/"><img src="https://img.shields.io/badge/-LinkedIn-0077B5?&logo=linkedin&logoColor=white&style=for-the-badge" /></a>
-            <a href="https://twitter.com/AhmedAliMexah"><img src="https://img.shields.io/badge/-Twitter-1DA1F2?&logo=twitter&logoColor=white&style=for-the-badge" /></a>
-            <a href="mailto:ahmedali110d@gmail.com"><img src="https://img.shields.io/badge/-Email-D14836?&logo=gmail&logoColor=white&style=for-the-badge" /></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `);
-});
+        `);
+      });
 
       renderPagination();
     }
