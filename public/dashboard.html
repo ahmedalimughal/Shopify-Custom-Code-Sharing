@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Dashboard</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <style>
+    body {
+      overflow-x: hidden;
+    }
+    .sidebar {
+      height: 100vh;
+      background-color: #111;
+    }
+    .sidebar a {
+      color: white;
+      padding: 15px;
+      display: block;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      background-color: #ffb400;
+    }
+    .main {
+      padding: 30px;
+    }
+    div#dataList {
+    height: 75vh;
+    overflow: scroll;
+}
+  </style>
+</head>
+<body>
+<script>
+// ❌ Redirect to login if not logged in
+if (localStorage.getItem("isLoggedIn") !== "true") {
+window.location.href = "login.html";
+}
+</script>
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="position-sticky">
+        <img src="/uploads/shopify-code-share.png" alt="" class="img-fluid py-3">
+        <a href="#dashboard" onclick="showContent('dashboard')">Dashboard</a>
+        <a href="#shopify-custom-sections" onclick="showContent('experience')">Shopify Custom Sections</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 main">
+      <div id="dashboard" class="content-section">
+
+    <div class="row">
+          <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by code or language">
+    </div>
+
+    <div id="dataList" class="row mt-4"></div>
+    <nav>
+      <ul class="pagination justify-content-center mt-4" id="pagination"></ul>
+    </nav>
+    </div>
+
+<script>
+    let allData = [];
+    let filteredData = [];
+    const itemsPerPage = 8;
+    let currentPage = 1;
+
+    function renderData(page = 1) {
+      $('#dataList').empty();
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageData = filteredData.slice(start, end);
+
+      if (pageData.length === 0) {
+        $('#dataList').html('<p>No data found.</p>');
+        $('#pagination').empty();
+        return;
+      }
+
+      pageData.forEach((item) => {
+        const exp = item.experience;
+        const imageUrl = exp.section_path ? `/${exp.section_path.replace(/\\/g, '/')}` : '';
+
+        $('#dataList').append(`
+          <div class="col-md-3 mb-3">
+            <div class="card h-100">
+              <div class="card-body">
+                ${imageUrl ? `<img src="${imageUrl}" class="img-fluid mb-2" />` : ''}
+                <h5 class="card-title">${exp.company}</h5>
+                <p class="card-text"><strong>Language:</strong> ${exp.code_language}</p>
+                <p class="card-text">${exp.description}</p>
+                <a href="${exp.description}" target="_blank" class="btn btn-primary">View Code</a>                  
+              </div>
+            </div>
+          </div>
+        `);
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  let paginationHTML = '';
+
+  // Prev button
+  paginationHTML += `
+    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" id="prevPage">Prev</a>
+    </li>`;
+
+  // Numbered pages
+  for (let i = 1; i <= totalPages; i++) {
+    paginationHTML += `
+      <li class="page-item ${i === currentPage ? 'active' : ''}">
+        <a class="page-link" href="#">${i}</a>
+      </li>`;
+  }
+
+  // Next button
+  paginationHTML += `
+    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" id="nextPage">Next</a>
+    </li>`;
+
+  $('#pagination').html(paginationHTML);
+
+  // Page number click
+  $('.page-link').not('#prevPage, #nextPage').click(function(e) {
+    e.preventDefault();
+    currentPage = parseInt($(this).text());
+    renderData(currentPage);
+  });
+
+  // Prev click
+  $('#prevPage').click(function(e) {
+    e.preventDefault();
+    if (currentPage > 1) {
+      currentPage--;
+      renderData(currentPage);
+    }
+  });
+
+  // Next click
+  $('#nextPage').click(function(e) {
+    e.preventDefault();
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderData(currentPage);
+    }
+  });
+}
+
+
+    function filterData(searchText) {
+      searchText = searchText.toLowerCase();
+      filteredData = allData.filter(item => {
+        const { company = '', code_language = '' } = item.experience;
+        return (
+          company.toLowerCase().includes(searchText) ||
+          code_language.toLowerCase().includes(searchText)
+        );
+      });
+      currentPage = 1;
+      renderData(currentPage);
+    }
+
+    $(document).ready(function() {
+      $.get('/experience', function(data) {
+        allData = data;
+        filteredData = data;
+        renderData(currentPage);
+      });
+
+      $('#searchInput').on('input', function() {
+        const searchText = $(this).val();
+        filterData(searchText);
+      });
+    });
+  </script>
+
+
+      </div>
+      <div id="experience" class="content-section d-none">
+        <h2>Experience</h2>
+        <p>Add and view your work experience here.</p>
+         <div class="col-md-12">
+      <!-- experience-form.html -->
+      <form id="experienceForm" class="needs-validation" novalidate enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Section Image</label>
+          <input type="file" class="form-control" name="section_image" id="section_image" placeholder="Section Image">
+          <div class="invalid-feedback">Please enter a description.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="company" class="form-label">Code Name</label>
+          <input type="text" class="form-control" id="company" name="company" placeholder="Code Name" required />
+          <div class="invalid-feedback">Please enter company name & duration.</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="position" class="form-label">Choose a programming language</label>
+          <select class="form-control" name="code_language" id="code_language" required="">
+          <option value="">Select a language</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="Shopify Liquid">Shopify Liquid</option>
+          <option value="WordPress">WordPress</option></select>
+          <div class="invalid-feedback">Please Select your language.</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Your Code</label>
+          <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter description..." required></textarea>
+          <div class="invalid-feedback">Please enter a description.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <div id="message" class="mt-3"></div>
+      </form>
+    </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script>
+  function logout() {
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "login.html";
+  }
+
+  function showContent(id) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
+    document.getElementById(id).classList.remove('d-none');
+  }
+
+
+  $('#experienceForm').on('submit', function (e) {
+  e.preventDefault();
+
+  if (!this.checkValidity()) {
+    this.classList.add('was-validated');
+    return;
+  }
+
+  const form = document.getElementById('experienceForm');
+  const formData = new FormData(form); // ← This picks ALL inputs, including file
+
+  $.ajax({
+    url: '/saveexperience',
+    type: 'POST',
+    data: formData,
+    processData: false,       // ← Don't convert to query string
+    contentType: false,       // ← Let browser set multipart/form-data
+    success: function (response) {
+      $('#message').html('<div class="alert alert-success">Saved!</div>');
+    },
+    error: function () {
+      $('#message').html('<div class="alert alert-danger">Error saving data.</div>');
+    }
+  });
+});
+
+
+</script>
+
+</script>
+</body>
+</html>

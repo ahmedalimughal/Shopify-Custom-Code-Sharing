@@ -1,0 +1,67 @@
+
+  <div class="row">
+    <div class="col-md-12">
+      <!-- experience-form.html -->
+      <form id="experienceForm" class="needs-validation" novalidate enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Section Image</label>
+          <input type="file" class="form-control" name="section_image" id="section_image" placeholder="Section Image">
+          <div class="invalid-feedback">Please enter a description.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="company" class="form-label">Code Name</label>
+          <input type="text" class="form-control" id="company" name="company" placeholder="Code Name" required />
+          <div class="invalid-feedback">Please enter company name & duration.</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="position" class="form-label">Choose a programming language</label>
+          <select class="form-control" name="code_language" id="code_language" required="">
+          <option value="">Select a language</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="Shopify Liquid">Shopify Liquid</option>
+          <option value="WordPress">WordPress</option></select>
+          <div class="invalid-feedback">Please Select your language.</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Your Code</label>
+          <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter description..." required></textarea>
+          <div class="invalid-feedback">Please enter a description.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <div id="message" class="mt-3"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    $('#experienceForm').on('submit', function(e) {
+  e.preventDefault();
+
+  if (!this.checkValidity()) {
+    this.classList.add('was-validated');
+    return;
+  }
+
+  const form = document.getElementById('experienceForm');
+  const formData = new FormData(form); // ← includes file too
+
+  $.ajax({
+    url: '/saveexperience',
+    type: 'POST',
+    data: formData,
+    processData: false, // ← don't process data
+    contentType: false, // ← let browser set it to multipart/form-data
+    success: function(response) {
+      $('#message').html('<div class="alert alert-success">Saved!</div>');
+    },
+    error: function() {
+      $('#message').html('<div class="alert alert-danger">Error saving data.</div>');
+    }
+  });
+});
+  </script>
